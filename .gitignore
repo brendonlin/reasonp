@@ -1,0 +1,7 @@
+dist
+.vscode
+env
+docs
+reasonp.egg-info
+.pytest_cache
+__pycache__
