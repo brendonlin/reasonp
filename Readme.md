@@ -6,6 +6,10 @@ You need to provide a fine-grained data so that you can find the reasons for you
 
 Example:
 
+```sh
+pip install reasonp
+```
+
 ```python
 import reasonp as rp
 

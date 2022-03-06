@@ -1,5 +1,4 @@
 import pandas as pd
-import ipdb
 
 
 def find_reason(
@@ -14,6 +13,7 @@ def find_reason(
     """
     search_columns = [col for col in df.columns if df.dtypes[col].name in ["object"]]
     reason_data_map = {}
+    print("Search :" + ",".join(search_columns))
     for search_column in search_columns:
         sub_reason_data = get_sub_reason_data(
             df,
@@ -23,6 +23,7 @@ def find_reason(
             compare_metric,
         )
         reason_data_map[search_column] = sub_reason_data
+
     total_diffrence_data = reason_data_map.pop(compare_column)
     total_diffrence = (
         total_diffrence_data["target_metric_value"].sum()
@@ -67,7 +68,7 @@ def get_sub_reason_data(
     elif isinstance(compare_metric, dict):
 
         compare_metric_name = list(compare_metric.keys())[0]
-        # ipdb.set_trace()
+
         target_df = target_df.agg(compare_metric).rename(
             {compare_metric_name: "target_metric_value"}, axis=1
         )
