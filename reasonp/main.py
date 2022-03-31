@@ -6,23 +6,51 @@ def find_reason(
     compare_column: str,
     compare_values: tuple,
     compare_metric: tuple = None,
+    weight_metric: tuple = None,
     limit=20,
 ) -> pd.DataFrame:
     """
     find reason for diffrence
     """
     search_columns = [col for col in df.columns if df.dtypes[col].name in ["object"]]
+    if compare_column not in search_columns:
+        search_columns.append(compare_column)
     reason_data_map = {}
     print("Search :" + ",".join(search_columns))
     for search_column in search_columns:
-        sub_reason_data = get_sub_reason_data(
+        reason_data_map[search_column] = get_sub_reason_data(
             df,
             search_column,
             compare_column,
             compare_values,
             compare_metric,
         )
-        reason_data_map[search_column] = sub_reason_data
+
+    if weight_metric is not None:
+        weight_data = get_sub_reason_data(
+            df,
+            search_column=compare_column,
+            compare_column=compare_column,
+            compare_values=compare_values,
+            compare_metric=weight_metric,
+        )
+        weight = weight_data[["target_metric_value", "compare_metric_value"]].values
+        if weight.shape[0] > 1:
+            weight = weight.sum(0)
+        target_weight, compare_weight = weight
+
+        for search_column in reason_data_map:
+            sub_reason_data = reason_data_map.get(search_column)
+            sub_reason_data["target_metric_value"] = (
+                sub_reason_data["target_metric_value"] / target_weight
+            )
+            sub_reason_data["compare_metric_value"] = (
+                sub_reason_data["compare_metric_value"] / compare_weight
+            )
+            sub_reason_data["metric_change"] = (
+                sub_reason_data["target_metric_value"]
+                - sub_reason_data["compare_metric_value"]
+            )
 
     total_diffrence_data = reason_data_map.pop(compare_column)
     total_diffrence = (

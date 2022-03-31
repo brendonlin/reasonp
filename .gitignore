@@ -6,3 +6,5 @@ reasonp.egg-info
 .pytest_cache
 __pycache__
 explore.ipynb
+tests/data
+tests/test_realdata.py
